@@ -1,0 +1,289 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+entity scoreboard is
+   Port (
+       clk    : in STD_LOGIC;
+       rst    : in STD_LOGIC;
+       incrA  : in STD_LOGIC;
+       decrA  : in STD_LOGIC;
+       incrB  : in STD_LOGIC;
+       decrB  : in STD_LOGIC;
+       an     : out STD_LOGIC_VECTOR (3 downto 0);
+       seg    : out STD_LOGIC_VECTOR (0 to 6);
+       dp     : out STD_LOGIC
+   );
+end scoreboard;
+architecture Behavioral of scoreboard is
+   signal scoreA, scoreB : INTEGER range 0 to 99 := 0;
+   signal Din            : STD_LOGIC_VECTOR(15 downto 0);
+   signal dp_in          : STD_LOGIC_VECTOR(3 downto 0) := "1111";
+   signal incA_prev, decA_prev : STD_LOGIC := '0';
+   signal incB_prev, decB_prev : STD_LOGIC := '0';
+   signal rst_prev, rst_sync   : STD_LOGIC := '0';
+   signal rst_counter          : INTEGER range 0 to 5 := 0;
+   component driver7seg
+       Port (
+           clk     : in STD_LOGIC;
+           Din     : in STD_LOGIC_VECTOR (15 downto 0);
+           an      : out STD_LOGIC_VECTOR (3 downto 0);
+           seg     : out STD_LOGIC_VECTOR (0 to 6);
+           dp_in   : in STD_LOGIC_VECTOR (3 downto 0);
+           dp_out  : out STD_LOGIC;
+           rst     : in STD_LOGIC
+       );
+   end component;
+begin
+   process(clk)
+   begin
+       if rising_edge(clk) then 
+           rst_sync <= rst;
+           incA_prev <= incrA;
+           decA_prev <= decrA;
+           incB_prev <= incrB;
+           decB_prev <= decrB;
+           
+           if rst_sync = '1' then
+               if rst_counter < 5 then
+                   rst_counter <= rst_counter + 1;
+               end if;
+           else
+               rst_counter <= 0;
+           end if;
+           if rst_counter = 5 then
+               scoreA <= 0;
+               scoreB <= 0;
+           else
+               
+               if incrA = '1' and incA_prev = '0' and scoreA < 99 then
+                   scoreA <= scoreA + 1;
+               elsif decrA = '1' and decA_prev = '0' and scoreA > 0 then
+                   scoreA <= scoreA - 1;
+               end if;
+               
+               if incrB = '1' and incB_prev = '0' and scoreB < 99 then
+                   scoreB <= scoreB + 1;
+               elsif decrB = '1' and decB_prev = '0' and scoreB > 0 then
+                   scoreB <= scoreB - 1;
+               end if;
+           end if;
+        case scoreA is
+    when 0  => Din(15 downto 8) <= "00000000"; 
+    when 1  => Din(15 downto 8) <= "00000001";
+    when 2  => Din(15 downto 8) <= "00000010";
+    when 3  => Din(15 downto 8) <= "00000011";
+    when 4  => Din(15 downto 8) <= "00000100";
+    when 5  => Din(15 downto 8) <= "00000101";
+    when 6  => Din(15 downto 8) <= "00000110";
+    when 7  => Din(15 downto 8) <= "00000111";
+    when 8  => Din(15 downto 8) <= "00001000";
+    when 9  => Din(15 downto 8) <= "00001001";
+    when 10 => Din(15 downto 8) <= "00010000"; 
+    when 11 => Din(15 downto 8) <= "00010001";
+    when 12 => Din(15 downto 8) <= "00010010";
+    when 13 => Din(15 downto 8) <= "00010011";
+    when 14 => Din(15 downto 8) <= "00010100";
+    when 15 => Din(15 downto 8) <= "00010101";
+    when 16 => Din(15 downto 8) <= "00010110";
+    when 17 => Din(15 downto 8) <= "00010111";
+   when 18 => Din(15 downto 8) <= "00011000";
+   when 19 => Din(15 downto 8) <= "00011001";
+   when 20 => Din(15 downto 8) <= "00100000"; 
+   when 21 => Din(15 downto 8) <= "00100001";
+   when 22 => Din(15 downto 8) <= "00100010";
+   when 23 => Din(15 downto 8) <= "00100011";
+   when 24 => Din(15 downto 8) <= "00100100";
+   when 25 => Din(15 downto 8) <= "00100101";
+   when 26 => Din(15 downto 8) <= "00100110";
+   when 27 => Din(15 downto 8) <= "00100111";
+   when 28 => Din(15 downto 8) <= "00101000";
+   when 29 => Din(15 downto 8) <= "00101001";
+   when 30 => Din(15 downto 8) <= "00110000";
+   when 31 => Din(15 downto 8) <= "00110001";
+   when 32 => Din(15 downto 8) <= "00110010";
+   when 33 => Din(15 downto 8) <= "00110011";
+   when 34 => Din(15 downto 8) <= "00110100";
+   when 35 => Din(15 downto 8) <= "00110101";
+   when 36 => Din(15 downto 8) <= "00110110";
+   when 37 => Din(15 downto 8) <= "00110111";
+   when 38 => Din(15 downto 8) <= "00111000";
+   when 39 => Din(15 downto 8) <= "00111001";
+   when 40 => Din(15 downto 8) <= "01000000";
+   when 41 => Din(15 downto 8) <= "01000001";
+   when 42 => Din(15 downto 8) <= "01000010";
+   when 43 => Din(15 downto 8) <= "01000011";
+   when 44 => Din(15 downto 8) <= "01000100";
+   when 45 => Din(15 downto 8) <= "01000101";
+   when 46 => Din(15 downto 8) <= "01000110";
+   when 47 => Din(15 downto 8) <= "01000111";
+   when 48 => Din(15 downto 8) <= "01001000";
+   when 49 => Din(15 downto 8) <= "01001001";
+   when 50 => Din(15 downto 8) <= "01010000";
+   when 51 => Din(15 downto 8) <= "01010001";
+   when 52 => Din(15 downto 8) <= "01010010";
+   when 53 => Din(15 downto 8) <= "01010011";
+   when 54 => Din(15 downto 8) <= "01010100";
+   when 55 => Din(15 downto 8) <= "01010101";
+   when 56 => Din(15 downto 8) <= "01010110";
+   when 57 => Din(15 downto 8) <= "01010111";
+   when 58 => Din(15 downto 8) <= "01011000";
+   when 59 => Din(15 downto 8) <= "01011001";
+   when 60 => Din(15 downto 8) <= "01100000";
+   when 61 => Din(15 downto 8) <= "01100001";
+   when 62 => Din(15 downto 8) <= "01100010";
+   when 63 => Din(15 downto 8) <= "01100011";
+   when 64 => Din(15 downto 8) <= "01100100";
+   when 65 => Din(15 downto 8) <= "01100101";
+   when 66 => Din(15 downto 8) <= "01100110";
+   when 67 => Din(15 downto 8) <= "01100111";
+   when 68 => Din(15 downto 8) <= "01101000";
+   when 69 => Din(15 downto 8) <= "01101001";
+   when 70 => Din(15 downto 8) <= "01110000";
+   when 71 => Din(15 downto 8) <= "01110001";
+   when 72 => Din(15 downto 8) <= "01110010";
+   when 73 => Din(15 downto 8) <= "01110011";
+   when 74 => Din(15 downto 8) <= "01110100";
+   when 75 => Din(15 downto 8) <= "01110101";
+   when 76 => Din(15 downto 8) <= "01110110";
+   when 77 => Din(15 downto 8) <= "01110111";
+   when 78 => Din(15 downto 8) <= "01111000";
+   when 79 => Din(15 downto 8) <= "01111001";
+   when 80 => Din(15 downto 8) <= "10000000";
+   when 81 => Din(15 downto 8) <= "10000001";
+   when 82 => Din(15 downto 8) <= "10000010";
+   when 83 => Din(15 downto 8) <= "10000011";
+   when 84 => Din(15 downto 8) <= "10000100";
+   when 85 => Din(15 downto 8) <= "10000101";
+   when 86 => Din(15 downto 8) <= "10000110";
+   when 87 => Din(15 downto 8) <= "10000111";
+   when 88 => Din(15 downto 8) <= "10001000";
+   when 89 => Din(15 downto 8) <= "10001001";
+   when 90 => Din(15 downto 8) <= "10010000";
+   when 91 => Din(15 downto 8) <= "10010001";
+   when 92 => Din(15 downto 8) <= "10010010";
+   when 93 => Din(15 downto 8) <= "10010011";
+   when 94 => Din(15 downto 8) <= "10010100";
+   when 95 => Din(15 downto 8) <= "10010101";
+   when 96 => Din(15 downto 8) <= "10010110";
+   when 97 => Din(15 downto 8) <= "10010111";
+   when 98 => Din(15 downto 8) <= "10011000";
+   when 99 => Din(15 downto 8) <= "10011001";
+   when others => Din(15 downto 8) <= "00000000";
+end case;
+           case scoreB is
+   when 0  => Din(7 downto 0) <= "00000000";
+   when 1  => Din(7 downto 0) <= "00000001";
+   when 2  => Din(7 downto 0) <= "00000010";
+   when 3  => Din(7 downto 0) <= "00000011";
+   when 4  => Din(7 downto 0) <= "00000100";
+   when 5  => Din(7 downto 0) <= "00000101";
+   when 6  => Din(7 downto 0) <= "00000110";
+   when 7  => Din(7 downto 0) <= "00000111";
+   when 8  => Din(7 downto 0) <= "00001000";
+   when 9  => Din(7 downto 0) <= "00001001";
+   when 10 => Din(7 downto 0) <= "00010000";
+   when 11 => Din(7 downto 0) <= "00010001";
+   when 12 => Din(7 downto 0) <= "00010010";
+   when 13 => Din(7 downto 0) <= "00010011";
+   when 14 => Din(7 downto 0) <= "00010100";
+   when 15 => Din(7 downto 0) <= "00010101";
+   when 16 => Din(7 downto 0) <= "00010110";
+   when 17 => Din(7 downto 0) <= "00010111";
+   when 18 => Din(7 downto 0) <= "00011000";
+   when 19 => Din(7 downto 0) <= "00011001";
+   when 20 => Din(7 downto 0) <= "00100000";
+   when 21 => Din(7 downto 0) <= "00100001";
+   when 22 => Din(7 downto 0) <= "00100010";
+   when 23 => Din(7 downto 0) <= "00100011";
+   when 24 => Din(7 downto 0) <= "00100100";
+   when 25 => Din(7 downto 0) <= "00100101";
+   when 26 => Din(7 downto 0) <= "00100110";
+   when 27 => Din(7 downto 0) <= "00100111";
+   when 28 => Din(7 downto 0) <= "00101000";
+   when 29 => Din(7 downto 0) <= "00101001";
+   when 30 => Din(7 downto 0) <= "00110000";
+   when 31 => Din(7 downto 0) <= "00110001";
+   when 32 => Din(7 downto 0) <= "00110010";
+   when 33 => Din(7 downto 0) <= "00110011";
+   when 34 => Din(7 downto 0) <= "00110100";
+   when 35 => Din(7 downto 0) <= "00110101";
+   when 36 => Din(7 downto 0) <= "00110110";
+   when 37 => Din(7 downto 0) <= "00110111";
+   when 38 => Din(7 downto 0) <= "00111000";
+   when 39 => Din(7 downto 0) <= "00111001";
+   when 40 => Din(7 downto 0) <= "01000000";
+   when 41 => Din(7 downto 0) <= "01000001";
+   when 42 => Din(7 downto 0) <= "01000010";
+   when 43 => Din(7 downto 0) <= "01000011";
+   when 44 => Din(7 downto 0) <= "01000100";
+   when 45 => Din(7 downto 0) <= "01000101";
+   when 46 => Din(7 downto 0) <= "01000110";
+   when 47 => Din(7 downto 0) <= "01000111";
+   when 48 => Din(7 downto 0) <= "01001000";
+   when 49 => Din(7 downto 0) <= "01001001";
+   when 50 => Din(7 downto 0) <= "01010000";
+   when 51 => Din(7 downto 0) <= "01010001";
+   when 52 => Din(7 downto 0) <= "01010010";
+   when 53 => Din(7 downto 0) <= "01010011";
+   when 54 => Din(7 downto 0) <= "01010100";
+   when 55 => Din(7 downto 0) <= "01010101";
+   when 56 => Din(7 downto 0) <= "01010110";
+   when 57 => Din(7 downto 0) <= "01010111";
+   when 58 => Din(7 downto 0) <= "01011000";
+   when 59 => Din(7 downto 0) <= "01011001";
+   when 60 => Din(7 downto 0) <= "01100000";
+   when 61 => Din(7 downto 0) <= "01100001";
+   when 62 => Din(7 downto 0) <= "01100010";
+   when 63 => Din(7 downto 0) <= "01100011";
+   when 64 => Din(7 downto 0) <= "01100100";
+   when 65 => Din(7 downto 0) <= "01100101";
+   when 66 => Din(7 downto 0) <= "01100110";
+   when 67 => Din(7 downto 0) <= "01100111";
+   when 68 => Din(7 downto 0) <= "01101000";
+   when 69 => Din(7 downto 0) <= "01101001";
+   when 70 => Din(7 downto 0) <= "01110000";
+   when 71 => Din(7 downto 0) <= "01110001";
+   when 72 => Din(7 downto 0) <= "01110010";
+   when 73 => Din(7 downto 0) <= "01110011";
+   when 74 => Din(7 downto 0) <= "01110100";
+   when 75 => Din(7 downto 0) <= "01110101";
+   when 76 => Din(7 downto 0) <= "01110110";
+   when 77 => Din(7 downto 0) <= "01110111";
+   when 78 => Din(7 downto 0) <= "01111000";
+   when 79 => Din(7 downto 0) <= "01111001";
+   when 80 => Din(7 downto 0) <= "10000000";
+   when 81 => Din(7 downto 0) <= "10000001";
+   when 82 => Din(7 downto 0) <= "10000010";
+   when 83 => Din(7 downto 0) <= "10000011";
+   when 84 => Din(7 downto 0) <= "10000100";
+   when 85 => Din(7 downto 0) <= "10000101";
+   when 86 => Din(7 downto 0) <= "10000110";
+   when 87 => Din(7 downto 0) <= "10000111";
+   when 88 => Din(7 downto 0) <= "10001000";
+   when 89 => Din(7 downto 0) <= "10001001";
+   when 90 => Din(7 downto 0) <= "10010000";
+   when 91 => Din(7 downto 0) <= "10010001";
+   when 92 => Din(7 downto 0) <= "10010010";
+   when 93 => Din(7 downto 0) <= "10010011";
+   when 94 => Din(7 downto 0) <= "10010100";
+   when 95 => Din(7 downto 0) <= "10010101";
+   when 96 => Din(7 downto 0) <= "10010110";
+   when 97 => Din(7 downto 0) <= "10010111";
+   when 98 => Din(7 downto 0) <= "10011000";
+   when 99 => Din(7 downto 0) <= "10011001";
+   when others => Din(7 downto 0) <= "00000000";
+end case;
+       end if;
+   end process;
+   
+   display_driver:driver7seg
+       port map (
+           clk     => clk,
+           Din     => Din,
+           an      => an,
+           seg     => seg,
+           dp_in   => dp_in,
+           dp_out  => dp,
+           rst     => '0'
+       );
+end Behavioral;
